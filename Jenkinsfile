@@ -53,7 +53,7 @@ pipeline {
                     passwordVariable: 'PASS'
                 )]) {
                     sh '''
-                    echo $PASS | docker login -u $USER --password-stdin
+                    echo $PASS | docker login -u shridhara --password-stdin
                     docker push shridhara/dockerfile:$latest
                     '''
                 }
