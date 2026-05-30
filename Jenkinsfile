@@ -40,7 +40,7 @@ pipeline {
             steps {
                 sh '''
                 trivy image --exit-code 1 --severity HIGH,CRITICAL \
-                $shridhara/dockerfile:$latest
+                shridhara/dockerfile:latest
                 '''
             }
         }
