@@ -54,7 +54,7 @@ pipeline {
                 )]) {
                     sh '''
                     echo $PASS | docker login -u shridhara --password-stdin
-                    docker push shridhara/dockerfile:$latest
+                    docker push shridhara/dockerfile:latest
                     '''
                 }
             }
