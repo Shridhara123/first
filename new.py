@@ -2,9 +2,19 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/")
 def home():
-    return jsonify({"status": "healthy", "version": "v1.0"})
+    return jsonify({
+        "message": "Hello from DevOps CI/CD Pipeline"
+    })
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+# NEW FEATURE
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "UP",
+        "version": "2.0"
+    })
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
