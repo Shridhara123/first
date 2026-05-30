@@ -15,7 +15,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('SonarQube Analysis') {}
             steps {
                 script {
             // This references the exact name you provided in Step 1
@@ -59,4 +59,3 @@ pipeline {
             }
         }
     }
-}
