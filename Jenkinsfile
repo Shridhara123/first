@@ -17,12 +17,14 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                    sonar-scanner \
-                    -Dsonar.projectKey=flask-app \
-                    -Dsonar.sources=.
-                    '''
+                script {
+            // This references the exact name you provided in Step 1
+            def scannerHome = tool 'sonar-scanner'
+            
+            // This references your configured SonarQube server environment
+            withSonarQubeEnv('SonarQube') { 
+                // Notice we are injecting the scannerHome path directly into the command
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=flask-app -Dsonar.sources=."
                 }
             }
         }
