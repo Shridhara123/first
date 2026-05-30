@@ -32,7 +32,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $shridhara/dockerfile:$latest.'
+                sh 'docker build -t $shridhara/dockerfile:$latest .'
             }
         }
 
