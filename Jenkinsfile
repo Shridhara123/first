@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "yshridhara/dockerfile"
+        IMAGE_NAME = "shridhara/dockerfile"
         IMAGE_TAG = "${BUILD_NUMBER}"
+        CONTAINER_NAME = "flask-app-container"
     }
 
     stages {
@@ -59,5 +60,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Server') {
+             steps {
+                 echo "Starting Continuous Deployment..."
+                 sh """
+                 docker stop flask-app-container || true
+                 docker rm flask-app-container || true
+                 docker pull shridhara/dockerfile:latest
+                 docker run -d --name flask-app-container -p 5000:5000 shridhara/dockerfile:latest
+                 """
+             }
+        }     
     }
 }
