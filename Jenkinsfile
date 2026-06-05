@@ -28,7 +28,7 @@ pipeline {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=flask-app -Dsonar.sources=."
                 }
             }
-        }
+          }
         }
 
         stage('Build Docker Image') {
@@ -50,8 +50,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
+                    usernameVariable: '$USER',
+                    passwordVariable: '$PASS'
                 )]) {
                     sh '''
                     echo $PASS | docker login -u shridhara --password-stdin
