@@ -4,7 +4,6 @@ pipeline {
     environment {
         IMAGE_NAME = "shridhara/dockerfile"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        CONTAINER_NAME = "flask-app-container"
     }
 
     stages {
@@ -19,30 +18,31 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-            // This references the exact name you provided in Step 1
-            def scannerHome = tool 'sonar-scanner'
-            
-            // This references your configured SonarQube server environment
-            withSonarQubeEnv('SonarQube') { 
-                // Notice we are injecting the scannerHome path directly into the command
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=flask-app -Dsonar.sources=."
+                    def scannerHome = tool 'sonar-scanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=flask-app \
+                        -Dsonar.sources=.
+                        """
+                    }
                 }
             }
-          }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t shridhara/dockerfile:latest .'
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
 
         stage('Trivy Scan') {
             steps {
-                sh '''
+                sh """
                 trivy image --exit-code 0 --severity HIGH,CRITICAL \
-                shridhara/dockerfile:latest
-                '''
+                ${IMAGE_NAME}:${IMAGE_TAG}
+                """
             }
         }
 
@@ -53,24 +53,38 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    sh '''
-                    echo $PASS | docker login -u shridhara --password-stdin
-                    docker push shridhara/dockerfile:latest
-                    '''
+                    sh """
+                    echo $PASS | docker login -u $USER --password-stdin
+                    docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                    """
                 }
             }
         }
 
-        stage('Deploy to Server') {
-             steps {
-                 echo "Starting Continuous Deployment..."
-                 sh """
-                 docker stop flask-app-container || true
-                 docker rm flask-app-container || true
-                 docker pull shridhara/dockerfile:latest
-                 docker run -d --name flask-app-container -p 5000:5000 shridhara/dockerfile:latest
-                 """
-             }
-        }     
+        stage('Deploy to GKE') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GCLOUD_KEY')]) {
+                        sh """
+                        echo "Authenticating to GCP..."
+                        gcloud auth activate-service-account --key-file=$GCLOUD_KEY
+
+                        echo "Connecting to GKE cluster..."
+                        gcloud container clusters get-credentials flask-cluster \
+                            --zone asia-south1-a \
+                            --project stone-ward-497816-t5
+
+                        echo "Deploying to Kubernetes..."
+                        kubectl apply -f k8s/deployment.yaml
+                        kubectl apply -f k8s/service.yaml
+
+                        echo "Updating image version..."
+                        kubectl set image deployment/flask-app \
+                        flask-app=${IMAGE_NAME}:${IMAGE_TAG}
+                        """
+                    }
+                }
+            }
+        }
     }
 }
