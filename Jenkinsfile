@@ -75,8 +75,8 @@ pipeline {
                             --project stone-ward-497816-t5
 
                         echo "Deploying to Kubernetes..."
-                        kubectl apply -f k8s/deployment.yaml
-                        kubectl apply -f k8s/service.yaml
+                        kubectl apply -f deploy.yaml
+                        kubectl apply -f deploy.yaml
 
                         echo "Updating image version..."
                         kubectl set image deployment/flask-app \
