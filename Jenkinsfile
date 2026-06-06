@@ -80,7 +80,7 @@ pipeline {
 
                         echo "Updating image version..."
                         kubectl set image deployment/flask-app \
-                        flask-app=${IMAGE_NAME}:${IMAGE_TAG}
+                        flask-app=shridhara/dockerfile:8
                         """
                     }
                 }
