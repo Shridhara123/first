@@ -80,7 +80,7 @@ pipeline {
 
                         echo "Updating image version..."
                         kubectl set image deployment/flask-app-deployment \
-                        flask-app-container=${IMAGE_NAME}:${IMAGE_TAG}
+                        flask-app=${IMAGE_NAME}:${IMAGE_TAG}
                         """
                     }
                 }
