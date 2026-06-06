@@ -79,8 +79,8 @@ pipeline {
                         kubectl apply -f deploy.yaml
 
                         echo "Updating image version..."
-                        kubectl set image deployment/flask-app \
-                        flask-app=shridhara/dockerfile:8
+                        kubectl set image deployment/flask-app-deployment \
+                        flask-app-container=${IMAGE_NAME}:${IMAGE_TAG}
                         """
                     }
                 }
